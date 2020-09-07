@@ -78,6 +78,66 @@ class Blockchain:
     
     
     
+    #Flask based web pack
+app  = Flask(__name__)
+
+#instance object of blockchain
+blockchain = Blockchain()
+
+
+#mining a new block
+@app.route('/mine_block', methods = ['GET'])
+def mine_block():
+    prev_block = blockchain.get_prev_block()
+    prev_proof = prev_block['proof']
+    proof = blockchain.poW(prev_proof)
+    prev_hash = blockchain.hash(prev_block) 
+    block = blockchain.create_block(proof , prev_hash)
+    response = {'message':"Woooh! Did you see that?",
+                'index' :block['index'],
+                'timestamps' : block['timestamp'],
+                'proof' : block['proof'],
+                'prev_hash' : block['prev_hash']
+                }
+    return jsonify(response),200 
+
+
+#to display full blockchain
+@app.route('/get_chain' , methods = ['GET'])
+
+def get_chain():
+    response = {'chian':blockchain.chain,
+                'length' : len(blockchain.chain)
+            }
+    return jsonify(response),200
+
+
+@app.route('/is_valid' , methods = ['GET'])
+def is_valid():
+    isvalid = blockchain.isValid(blockchain.chain)
+    if isvalid:
+        response = {"message":"Blockhain is valid"}
+    else:
+        response = {'message': "Blockchain is not valid"}
+        
+    return jsonify(response) , 200
+
+
+
+    
+
+
+
+
+#lets run out of here
+    
+app.run(host = '0.0.0.0' , port = 5000)
+
+
+
+
+    
+    
             
                 
         
